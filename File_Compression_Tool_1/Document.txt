@@ -1,0 +1,1 @@
+This is a sample document for testing compression. It has many words that repeat. Words that repeat are good for compression. Compression works better when words repeat. This document has many words that repeat many times.
