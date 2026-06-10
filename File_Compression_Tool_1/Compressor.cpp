@@ -1,32 +1,46 @@
-#include <iostream>      // Input/output (cout, cin)
-#include <fstream>       // File handling (opening, reading, writing)
-#include <string>        // String operations
-#include <vector>        // Dynamic arrays for triples
-#include <algorithm>     // max(), min() functions
-#include <iomanip>       // For formatting output
-#include <climits>       // INT_MAX, etc.
-using namespace std;
-const int WINDOW_SIZE = 4096;      // 4KB sliding window
-const int LOOKAHEAD_SIZE = 256;    // 256-byte lookahead
-const int OFFSET_BITS = 12;        // 12 bits for offset (4096 positions)
-const int LENGTH_BITS = 8;         // 8 bits for length (256 max)
-bool even(int n){
-    if(n%2==0){
-        return true;
-    }
-    else{
-        return false;
-    }
-}
-
-int main(){
+int main() {
+    std::string text = "huffman algorithm example";
     
-int n;
-cout<<"Enter a number:"<<endl;
-cin>>n;
-even(n);
+    // 1. Count frequency of each character
+    std::unordered_map<char, int> freq;
+    for (char ch : text) {
+        freq[ch]++;
+    }
 
+    // 2. Create a min heap & push all leaf nodes
+    std::priority_queue<Node*, std::vector<Node*>, Compare> minHeap;
+    for (auto pair : freq) {
+        minHeap.push(new Node(pair.first, pair.second));
+    }
 
+    // 3. Iterate until size of heap becomes 1
+    while (minHeap.size() != 1) {
+        // Pop the two nodes of highest priority (lowest frequency)
+        Node *left = minHeap.top(); minHeap.pop();
+        Node *right = minHeap.top(); minHeap.pop();
 
+        // Create a new internal node with a frequency equal to the sum of the two nodes.
+        // '$' is just a placeholder for internal nodes that don't hold actual characters.
+        Node *top = new Node('$', left->freq + right->freq);
+        top->left = left;
+        top->right = right;
+
+        minHeap.push(top);
+    }
+
+    // The remaining node is the root of the Huffman Tree
+    Node* root = minHeap.top();
+
+    // 4. Traverse the tree and print the codes
+    std::unordered_map<char, std::string> huffmanCode;
+    generateCodes(root, "", huffmanCode);
+
+    std::cout << "Huffman Codes:\n" << std::endl;
+    for (auto pair : huffmanCode) {
+        std::cout << pair.first << " : " << pair.second << std::endl;
+    }
+
+    // Clean up memory
+    delete root;
     return 0;
 }
